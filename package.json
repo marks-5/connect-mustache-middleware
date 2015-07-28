@@ -31,7 +31,7 @@
     }
   ],
   "license": "ISC",
-  "devDependencies" {
+  "devDependencies" : {
       "mocha": "2.2.5"
   },
   "dependencies": {
