@@ -1,0 +1,62 @@
+{
+  "name": "connect-mustache-middleware",
+  "version": "0.0.1",
+  "description": "Connect middleware to compile Mustache templates",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "connect",
+    "mustache"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DigitalInnovation/connect-mustache-middleware.git"
+  },
+  "bugs": {
+    "url": "https://github.com/DigitalInnovation/connect-mustache-middleware/issues"
+  },
+  "homepage": "https://github.com/DigitalInnovation/connect-mustache-middleware",
+  "author": {
+    "name": "Bowen, Alex",
+    "email": "Alex.Bowen@marks-and-spencer.com"
+  },
+  "contributors": [
+    {
+      "name": "Rakesh Rawat",
+      "email": "rakeshrawatg@gmail.com"
+    }
+  ],
+  "license": "ISC",
+  "devDependencies" {
+      "mocha": "2.2.5"
+  },
+  "dependencies": {
+    "mustache": "^0.8.2",
+    "stream-buffers": "^1.0.0"
+  },
+  "gitHead": "14a8960b90fbc158a3a7c21607560eff0c8011e2",
+  "_id": "connect-mustache-middleware@0.0.1",
+  "_shasum": "2db69dad3722a9445a87bf7a1926543e833a540b",
+  "_from": "connect-mustache-middleware@0.0.1",
+  "_npmVersion": "1.4.23",
+  "_npmUser": {
+    "name": "alex.bowen",
+    "email": "alexbowen123@googlemail.com"
+  },
+  "maintainers": [
+    {
+      "name": "alex.bowen",
+      "email": "alexbowen123@googlemail.com"
+    }
+  ],
+  "dist": {
+    "shasum": "2db69dad3722a9445a87bf7a1926543e833a540b",
+    "tarball": "http://registry.npmjs.org/connect-mustache-middleware/-/connect-mustache-middleware-0.0.1.tgz"
+  },
+  "_resolved": "https://registry.npmjs.org/connect-mustache-middleware/-/connect-mustache-middleware-0.0.1.tgz",
+  "readme": "ERROR: No README data found!"
+}
