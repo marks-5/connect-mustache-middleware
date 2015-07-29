@@ -1,3 +1,5 @@
+"use strict";
+
 /*
  File: mustacheEngine.js
  Description:
@@ -30,8 +32,6 @@ var MustacheEngine = {
         staticDataTypes: {}
     },
 
-    defaults : {},
-
     staticData: {},
 
     regex: {
@@ -42,7 +42,7 @@ var MustacheEngine = {
 
     partials: {},
 
-    excludeFlags : ['NO_CACHE'],
+    excludeFlags: ['NO_CACHE'],
 
     /*
      Function: setOptions
@@ -63,7 +63,7 @@ var MustacheEngine = {
      Returns: NA
      */
     setDefaults: function (defaults) {
-        extend(this.defaults, defaults);
+        this.defaults = defaults;
     },
 
     /*
@@ -103,14 +103,14 @@ var MustacheEngine = {
         return body;
     },
 
-    removeMustacheSyntax : function (text) {
+    removeMustacheSyntax: function (text) {
         return text
             .replace(/\s/g, '')
             .replace(/\s*\}{2,3}/, '')
             .replace(/\s*\{{2,3}>/, '');
     },
 
-    excludeFlagMatch : function (text) {
+    excludeFlagMatch: function (text) {
         return this.excludeFlags.indexOf(text) > -1;
     },
 
@@ -324,7 +324,7 @@ var MustacheEngine = {
      Returns: 'default' value if query string param not present or param value does not match defaults.CHANNEL else param value
      */
     getChannel: function (query) {
-        var value = (query['channel'] || this.defaults.CHANNEL.DEFAULT).toLowerCase();
+        var value = (query.channel || this.defaults.CHANNEL.DEFAULT).toLowerCase();
 
         if (value !== this.defaults.CHANNEL.DEFAULT && value !== this.defaults.CHANNEL.TSOP && value !== this.defaults.CHANNEL.BUSER) {
             value = this.defaults.CHANNEL.DEFAULT;
@@ -352,13 +352,15 @@ var MustacheEngine = {
      Returns: N/A
      */
     setStaticData: function (channel, pagePath) {
+
         for (var t in this.options.staticDataTypes) {
+
             var dataType = this.options.staticDataTypes[t];
             var setting = this.defaults.get(channel, dataType);
 
             this.staticData[dataType] = setting;
 
-            if(dataType === mustacheConfig.staticDataTypes.CHECKOUT_HEADER) {
+            if (dataType === this.options.staticDataTypes.CHECKOUT_HEADER) {
                 this.staticData[dataType] = setting[pagePath];
             }
         }
@@ -394,33 +396,33 @@ var MustacheEngine = {
 
             res.write = function (chunk) {
 
-              try {
-                var mustacheTemplate = chunk.toString();
+                try {
+                    var mustacheTemplate = chunk.toString();
 
-                MustacheEngine.parseRequestHtml(mustacheTemplate);
-                MustacheEngine.includePartials();
-                MustacheEngine.compileTemplates();
+                    MustacheEngine.parseRequestHtml(mustacheTemplate);
+                    MustacheEngine.includePartials();
+                    MustacheEngine.compileTemplates();
 
-                completeBody = MustacheEngine.replacePartials(mustacheTemplate);
+                    completeBody = MustacheEngine.replacePartials(mustacheTemplate);
 
-                if (!res.headersSent) {
-                    res.setHeader('Content-Length', completeBody.length);
+                    if (!res.headersSent) {
+                        res.setHeader('Content-Length', completeBody.length);
+                    }
+
+                    return write.call(res, completeBody);
+                } catch (e) {
+                    if (!res.headersSent) {
+                        res.writeHead(500, {'Content-Type': 'text/plain'});
+                    }
+
+                    console.dir(e);
+                    return write.call(res, e.message);
                 }
-
-                return write.call(res, completeBody);
-              } catch(e) {
-                if (!res.headersSent) {
-                  res.writeHead(500, {'Content-Type': 'text/plain'});
-                }
-
-                console.dir(e);
-                return write.call(res, e.message);
-              }
             };
 
             next();
-        }
+        };
     }
 };
 
-module.exports = exports = MustacheEngine;
+module.exports =  MustacheEngine;

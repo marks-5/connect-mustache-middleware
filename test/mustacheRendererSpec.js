@@ -1,7 +1,7 @@
-var assert = require("assert");
+var assert = require('assert');
 var data = {};
 var contract = {};
-var Mustache = require("mustache");
+var Mustache = require('mustache');
 var mustacheEngine = require('../index.js');
 var fs = require('fs');
 var body;
@@ -10,7 +10,7 @@ describe('MustacheEngine', function() {
 
     describe('setOptions', function() {
 
-        it('passed options extend defualts', function() {
+        it('should extend default options if passed', function() {
 
             mustacheEngine.setOptions({
                 rootDir: 'x',
@@ -67,10 +67,10 @@ describe('MustacheEngine', function() {
 
             mustacheEngine.parseRequestHtml(body);
 
-            assert.equal(mustacheEngine.partials['views/header|header'].data['headerData'], 'HEADER SECTION DATA');
+            assert.equal(mustacheEngine.partials['views/header|header'].data.headerData, 'HEADER SECTION DATA');
             assert.equal(mustacheEngine.partials['views/header|header'].content, '<h2>{{headerData}}</h2>');
 
-            assert.equal(mustacheEngine.partials['views/content|content'].data['contentData'], 'CONTENT SECTION DATA');
+            assert.equal(mustacheEngine.partials['views/content|content'].data.contentData, 'CONTENT SECTION DATA');
             assert.equal(mustacheEngine.partials['views/content|content'].content, '<h3>{{contentData}}</h3>\n{{> views/nested}}');
 
             assert.equal(mustacheEngine.partials['views/footer'].data, null);
@@ -89,14 +89,14 @@ describe('MustacheEngine', function() {
     });
 
     describe('Method: includePartials', function() {
-        it('nested partials should be included correctly', function() {
+        it('should correctly include nested partials', function() {
             mustacheEngine.includePartials();
         });
     });
 
     describe('Method: compileTemplates', function() {
 
-        it('data if present should be compiles into the template', function() {
+        it('should compile into the template if data is present', function() {
             mustacheEngine.compileTemplates();
 
             assert.equal(mustacheEngine.partials['views/content|content'].content, '<h3>CONTENT SECTION DATA</h3>\n<h4>NESTED SECTION DATA</h4>');
@@ -108,7 +108,7 @@ describe('MustacheEngine', function() {
 
     describe('Method: replacePartials', function() {
 
-        it('partial syntax should correctly replaced with html', function() {
+        it('should correctly replace partial syntax in html', function() {
             body = mustacheEngine.replacePartials(body);
 
             assert.equal(body, '<h1>index page</h1>\n<h2>HEADER SECTION DATA</h2>\n<h3>CONTENT SECTION DATA</h3>\n<h4>NESTED SECTION DATA</h4>\n<h2></h2>');
@@ -117,7 +117,7 @@ describe('MustacheEngine', function() {
 
     describe('Method: excludeFlagMatch', function() {
 
-        it('partial syntax should correctly replaced with html', function() {
+        it('should correctly replace partial syntax in html if eclude flag is present', function() {
             mustacheEngine.excludeFlags = ['TEST_FLAG', 'OTHER_TEST_FLAG'];
             assert.equal(mustacheEngine.excludeFlagMatch('TEST_FLAG'), true);
             assert.equal(mustacheEngine.excludeFlagMatch('OTHER_TEST_FLAG'), true);
