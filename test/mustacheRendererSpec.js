@@ -26,8 +26,8 @@ describe('MustacheEngine', function() {
             assert.equal(mustacheEngine.options.templateExt, '.html');
 
             mustacheEngine.setOptions({
-                rootDir: './lib/connect-mustache-middleware/test/demo/rootDir',
-                dataDir: './lib/connect-mustache-middleware/test/demo/dataDir',
+                rootDir: './test/demo/rootDir',
+                dataDir: './test/demo/dataDir',
                 datafileExt: '.json',
                 templateExt: '.html',
                 exclude : 'command'
