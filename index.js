@@ -15,9 +15,7 @@ var WritableStream = require("stream-buffers").WritableStreamBuffer;
 var fs = require('fs');
 var path = require('path');
 var Mustache = require('mustache');
-//var mustacheConfig = require('../../config/default/mustache');
 var extend = require('extend');
-//var defaults = require('../../mock/src/channel/defaults');
 var util = require('util');
 
 var MustacheEngine = {
@@ -31,6 +29,8 @@ var MustacheEngine = {
         exclude: '',
         staticDataTypes: {}
     },
+
+    defaults : {},
 
     staticData: {},
 
@@ -53,6 +53,17 @@ var MustacheEngine = {
      */
     setOptions: function (options) {
         extend(this.options, options);
+    },
+
+    /*
+     Function: setDefaults
+     Set defaults for mustache engine
+     Params:
+     - defaults: key/value defaults
+     Returns: NA
+     */
+    setDefaults: function (defaults) {
+        extend(this.defaults, defaults);
     },
 
     /*
@@ -313,10 +324,10 @@ var MustacheEngine = {
      Returns: 'default' value if query string param not present or param value does not match defaults.CHANNEL else param value
      */
     getChannel: function (query) {
-        var value = (query['channel'] || defaults.CHANNEL.DEFAULT).toLowerCase();
+        var value = (query['channel'] || this.defaults.CHANNEL.DEFAULT).toLowerCase();
 
-        if (value !== defaults.CHANNEL.DEFAULT && value !== defaults.CHANNEL.TSOP && value !== defaults.CHANNEL.BUSER) {
-            value = defaults.CHANNEL.DEFAULT;
+        if (value !== this.defaults.CHANNEL.DEFAULT && value !== this.defaults.CHANNEL.TSOP && value !== this.defaults.CHANNEL.BUSER) {
+            value = this.defaults.CHANNEL.DEFAULT;
         }
 
         return value;
@@ -343,7 +354,7 @@ var MustacheEngine = {
     setStaticData: function (channel, pagePath) {
         for (var t in this.options.staticDataTypes) {
             var dataType = this.options.staticDataTypes[t];
-            var setting = defaults.get(channel, dataType);
+            var setting = this.defaults.get(channel, dataType);
 
             this.staticData[dataType] = setting;
 
@@ -360,9 +371,11 @@ var MustacheEngine = {
      - options: key/value options settings for middleware
      Returns: NA
      */
-    middleware: function (options) {
+    middleware: function (options, defaults) {
 
         this.setOptions(options);
+
+        this.setDefaults(defaults);
 
         return function (req, res, next) {
 
