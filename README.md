@@ -15,11 +15,11 @@ connect().use(mustacheEngine.middleware({
     exclude: 'path/to/exclude',
     staticDataTypes: {
         CONFIG: 'config'
-    }))
+    }));
 
 ```
 
-## Installation
+## Unit tests
  ```
  npm test
  ```
