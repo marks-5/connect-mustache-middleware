@@ -11,13 +11,13 @@
  exclude : '' //pattern for requests to be excluded (similar to RewriteCondition)
  */
 
-var WritableStream = require("../../node_modules/stream-buffers").WritableStreamBuffer;
+var WritableStream = require("stream-buffers").WritableStreamBuffer;
 var fs = require('fs');
 var path = require('path');
-var Mustache = require('../../node_modules/mustache');
-var mustacheConfig = require('../../config/default/mustache');
+var Mustache = require('mustache');
+//var mustacheConfig = require('../../config/default/mustache');
 var extend = require('extend');
-var defaults = require('../../mock/src/channel/defaults');
+//var defaults = require('../../mock/src/channel/defaults');
 var util = require('util');
 
 var MustacheEngine = {
