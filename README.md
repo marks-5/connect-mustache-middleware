@@ -5,19 +5,24 @@ Connect middleware to compile requested html file as a mustache template before 
 ## Example
 
 ```js
-var mustacheEngine = require('./lib/mustache-engine/mustacheEngine.js');
+var mustacheEngine = require('connect-mustache-middleware');
 
 connect().use(mustacheEngine.middleware({
-	rootDir: '.tmp', // path to look mustache templates
-	dataDir: 'mock/data' // path to look for JSON data files
-}))
+    rootDir: 'application/root/directory,
+    dataDir: 'mock/data',
+    datafileExt: '.json',
+    templateExt: '.html',
+    exclude: 'path/to/exclude',
+    staticDataTypes: {
+        CONFIG: 'config'
+    }));
 
 ```
 
-## Installation
-Currently its not a published node module so we need to include it using require() call.
-
-var mustacheEngine = require('./lib/mustache-engine/mustacheEngine.js');
+## Unit tests
+ ```
+ npm test
+ ```
 
 
 ## Features
