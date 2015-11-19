@@ -10,6 +10,7 @@ var mustacheEngine = require('connect-mustache-middleware');
 connect().use(mustacheEngine.middleware({
     rootDir: 'application/root/directory,
     dataDir: 'mock/data',
+    templatePathOverides : null,
     datafileExt: '.json',
     templateExt: '.html',
     exclude: 'path/to/exclude',
