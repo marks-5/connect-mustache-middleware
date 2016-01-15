@@ -36,8 +36,8 @@ var MustacheEngine = {
     staticData: {},
 
     regex: {
-        partial: /\{{2,3}\s*\>\s[_-a-zA-Z0-9%\/\.\|\s]*\}{2,3}/img,
-        template: /[^a-zA-Z0-9%\.\/\\]/img,
+        partial: /\{{2,3}\s*\>\s[_-a-zA-Z0-9%@\/\.\|\s]*\}{2,3}/img,
+        template: /[^_-a-zA-Z0-9%@\.\/\\]/img,
         placeHolder: /%s/img
     },
 

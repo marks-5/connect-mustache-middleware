@@ -1,12 +1,10 @@
-var assert = require('assert');
-var data = {};
-var contract = {};
-var Mustache = require('mustache');
-var mustacheEngine = require('../index.js');
-var fs = require('fs');
-var body;
-
 describe('MustacheEngine', function() {
+
+    var assert = require('assert');
+    var data = {};
+    var mustacheEngine = require('../index.js');
+    var fs = require('fs');
+    var body;
 
     describe('setOptions', function() {
 

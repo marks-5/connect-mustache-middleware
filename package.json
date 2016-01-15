@@ -36,8 +36,8 @@
       "extend": "2.0.1"
   },
   "dependencies": {
-    "mustache": "^0.8.2",
-    "stream-buffers": "^1.0.0"
+    "mustache": "0.8.2",
+    "stream-buffers": "1.0.0"
   },
   "gitHead": "14a8960b90fbc158a3a7c21607560eff0c8011e2",
   "_id": "connect-mustache-middleware@0.0.1",
