@@ -404,7 +404,9 @@ var MustacheEngine = {
         return function (req, res, next) {
 
             // Skip mustache rendering if the resource is in exclusions list
-            if (req.url.match(/\./) || req.url.match(MustacheEngine.options.exclude)) {
+            var exclude = MustacheEngine.options.exclude;
+
+            if (req.url.match(/\./) || (exclude && req.url.match(exclude))) {
                 return next();
             }
 
