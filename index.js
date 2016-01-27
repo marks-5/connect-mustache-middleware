@@ -13,7 +13,6 @@
  exclude : '' //pattern for requests to be excluded (similar to RewriteCondition)
  */
 
-var WritableStream = require("stream-buffers").WritableStreamBuffer;
 var fs = require('fs');
 var path = require('path');
 var Mustache = require('mustache');
