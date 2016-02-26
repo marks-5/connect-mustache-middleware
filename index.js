@@ -347,7 +347,7 @@ var MustacheEngine = {
     getChannel: function (query) {
         var value = (query.channel || this.defaults.CHANNEL.DEFAULT).toLowerCase();
 
-        if (value !== this.defaults.CHANNEL.DEFAULT && value !== this.defaults.CHANNEL.TSOP && value !== this.defaults.CHANNEL.BUSER) {
+        if (value !== this.defaults.CHANNEL.DEFAULT && value !== this.defaults.CHANNEL.TSOP && value !== this.defaults.CHANNEL.BUSER && value !== this.defaults.CHANNEL.CFTO) {
             value = this.defaults.CHANNEL.DEFAULT;
         }
 
