@@ -365,6 +365,27 @@ var MustacheEngine = {
         return req._parsedUrl.pathname.replace(/^\/|\/$/g, '');
     },
 
+    getPageParams: function (req) {
+
+        var query = req._parsedUrl.query,
+            returnParams = {};
+
+        if (query) {
+            var params = query.split('&');
+
+            for (var i = 0; i < params.length; i++) {
+
+                var splitParam = params[i].split('=');
+
+                if (splitParam.length === 2) {
+                    returnParams[splitParam[0]] = splitParam[1]
+                }
+            }
+        }
+
+        return returnParams;
+    },
+
     /*
      Function: setStaticData
      configures static data used by Mustache engine
@@ -385,6 +406,14 @@ var MustacheEngine = {
                 this.staticData[dataType] = setting[pagePath];
             }
         }
+    },
+
+    swapMappers: function (template, oldMapper, newMapper) {
+
+        var mapper = new RegExp(oldMapper, 'gi'),
+            template = template.replace(mapper, newMapper);
+
+        return template;
     },
 
     /*
@@ -411,6 +440,7 @@ var MustacheEngine = {
 
             var channel = MustacheEngine.getChannel(req.query);
             var pagePath = MustacheEngine.getPagePath(req);
+            var pageParams = MustacheEngine.getPageParams(req);
 
             MustacheEngine.setStaticData(channel, pagePath);
 
@@ -421,6 +451,10 @@ var MustacheEngine = {
 
                 try {
                     var mustacheTemplate = chunk.toString();
+
+                    if (pageParams.oldMapper && pageParams.newMapper) {
+                        mustacheTemplate = MustacheEngine.swapMappers(mustacheTemplate, pageParams.oldMapper, pageParams.newMapper);
+                    }
 
                     MustacheEngine.parseRequestHtml(mustacheTemplate);
                     MustacheEngine.includePartials();
