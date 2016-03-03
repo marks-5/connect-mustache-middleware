@@ -6,7 +6,10 @@
     "test": "test"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "docs": "./node_modules/.bin/jsdoc index.js --recurse --destination _gh_pages/docs --readme README.md",
+    "prepublish": "npm test",
+    "postpublish": "node postpublish"
   },
   "keywords": [
     "connect",
@@ -32,7 +35,10 @@
   ],
   "license": "ISC",
   "devDependencies": {
-    "mocha": "2.2.5"
+    "mocha": "2.2.5",
+    "eslint": "1.2.1",
+    "gh-pages": "0.10.0",
+    "jsdoc": "3.4.0"
   },
   "dependencies": {
     "mustache": "0.8.2",
