@@ -341,17 +341,11 @@ var MustacheEngine = {
      Function: getChannel
      Gets the query string value for channel
      Params:
-     - query: connect middleware query string
+     - channel: string
      Returns: 'default' value if query string param not present or param value does not match defaults.CHANNEL else param value
      */
-    getChannel: function (query) {
-        var value = (query.channel || this.defaults.CHANNEL.DEFAULT).toLowerCase();
-
-        if (value !== this.defaults.CHANNEL.DEFAULT && value !== this.defaults.CHANNEL.TSOP && value !== this.defaults.CHANNEL.BUSER && value !== this.defaults.CHANNEL.CFTO) {
-            value = this.defaults.CHANNEL.DEFAULT;
-        }
-
-        return value;
+    getChannel: function (channel) {
+        return channel || this.defaults.CHANNEL.DEFAULT.toLowerCase();
     },
 
     /*
@@ -438,9 +432,9 @@ var MustacheEngine = {
                 return next();
             }
 
-            var channel = MustacheEngine.getChannel(req.query);
             var pagePath = MustacheEngine.getPagePath(req);
             var pageParams = MustacheEngine.getPageParams(req);
+            var channel = MustacheEngine.getChannel(pageParams.channel);
 
             MustacheEngine.setStaticData(channel, pagePath);
 
