@@ -34,6 +34,8 @@
   "devDependencies": {
     "mocha": "2.2.5",
     "eslint": "1.2.1",
+    "fear-core-build" : "1.1.0",
+    "fear-core-ui": "https://github.com/DigitalInnovation/fear-core-ui#develop",
     "gh-pages": "0.10.0",
     "jsdoc": "3.4.0"
   },
