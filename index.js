@@ -1,4 +1,6 @@
-"use strict";
+/*eslint max-depth:0*/
+
+'use strict';
 
 /**
  * File: mustacheEngine.js
@@ -8,7 +10,6 @@
  */
 
 var fs = require('fs');
-var path = require('path');
 var Mustache = require('mustache');
 var extend = require('extend');
 var util = require('util');
@@ -39,7 +40,7 @@ var MustacheEngine = {
     },
 
     staticData: {},
-    
+
     regex: {
         partial: /\{{2,3}\s*\>\s[_-a-zA-Z0-9%@\/\.\|\s]*\}{2,3}/img,
         template: /[^_-a-zA-Z0-9%@\.\/\\]/img,
@@ -133,22 +134,25 @@ var MustacheEngine = {
         var partial, content;
 
         for (var p in this.partials) {
+            if (this.partials.hasOwnProperty(p)) {
+                partial = this.partials[p];
 
-            partial = this.partials[p];
+                if (partial.data) {
 
-            if (partial.data) {
+                    for (var d in this.staticData) {
+                        if (this.staticData.hasOwnProperty(d)) {
+                            partial.data[d] = this.staticData[d];
+                        }
+                    }
 
-                for (var d in this.staticData) {
-                    partial.data[d] = this.staticData[d];
+                    content = Mustache.render(partial.content, partial.data);
+                } else {
+                    //compile with static data only
+                    content = Mustache.render(partial.content, this.staticData);
                 }
 
-                content = Mustache.render(partial.content, partial.data);
-            } else {
-                //compile with static data only
-                content = Mustache.render(partial.content, this.staticData);
+                this.partials[p].content = content;
             }
-
-            this.partials[p].content = content;
         }
     },
 
@@ -217,7 +221,7 @@ var MustacheEngine = {
 
         var parts = path.split('/');
 
-        return this.options.templatePathOverides[parts[0]]
+        return this.options.templatePathOverides[parts[0]];
     },
 
     /**
@@ -230,7 +234,7 @@ var MustacheEngine = {
         var parts = path.split('/');
 
         if (this.options.templatePathOverides[parts[0]]) {
-            path = path.replace(parts[0], this.options.templatePathOverides[parts[0]])
+            path = path.replace(parts[0], this.options.templatePathOverides[parts[0]]);
         }
 
         return path;
@@ -312,7 +316,9 @@ var MustacheEngine = {
 
         var fileName;
 
-        if (!identifier) return false;
+        if (!identifier) {
+            return false;
+        }
 
         fileName = this.parsePartialDataFileName(identifier);
 
@@ -330,20 +336,22 @@ var MustacheEngine = {
         // replace all appearance of partials ({{> file}}) with actual file contents
         for (var p in this.partials) {
 
-            content = this.partials[p].content;
+            if (this.partials.hasOwnProperty(p)) {
+                content = this.partials[p].content;
 
-            do {
-                matches = content.match(this.regex.partial) || [];
+                do {
+                    matches = content.match(this.regex.partial) || [];
 
-                if (matches) {
-                    for (var i = 0; i < matches.length; i++) {
-                        content = content.replace(matches[i], this.getPartialContent(matches[i]), this.staticData.config);
+                    if (matches) {
+                        for (var i = 0; i < matches.length; i++) {
+                            content = content.replace(matches[i], this.getPartialContent(matches[i]), this.staticData.config);
+                        }
                     }
-                }
 
-            } while (matches && matches.length > 0);
+                } while (matches && matches.length > 0);
 
-            this.partials[p].content = content;
+                this.partials[p].content = content;
+            }
         }
     },
 
@@ -383,7 +391,7 @@ var MustacheEngine = {
                 var splitParam = params[i].split('=');
 
                 if (splitParam.length === 2) {
-                    returnParams[splitParam[0]] = splitParam[1]
+                    returnParams[splitParam[0]] = splitParam[1];
                 }
             }
         }
@@ -401,13 +409,17 @@ var MustacheEngine = {
 
         for (var t in this.options.staticDataTypes) {
 
-            var dataType = this.options.staticDataTypes[t];
-            var setting = this.defaults.get(channel, dataType);
+            if (this.options.staticDataTypes.hasOwnProperty(t)) {
 
-            this.staticData[dataType] = setting;
+                var dataType = this.options.staticDataTypes[t];
+                var setting = this.defaults.get(channel, dataType);
 
-            if (dataType === this.options.staticDataTypes.CHECKOUT_HEADER) {
-                this.staticData[dataType] = setting[pagePath];
+                this.staticData[dataType] = setting;
+
+                if (dataType === this.options.staticDataTypes.CHECKOUT_HEADER) {
+                    this.staticData[dataType] = setting[pagePath];
+
+                }
             }
         }
     },
@@ -485,7 +497,7 @@ var MustacheEngine = {
                         res.writeHead(500, {'Content-Type': 'text/plain'});
                     }
 
-                    console.dir(e);
+                    process.stdout.write(e);
                     return write.call(res, e.message);
                 }
             };

@@ -1,7 +1,8 @@
+'use strict';
+
 describe('MustacheEngine', function() {
 
     var assert = require('assert');
-    var data = {};
     var mustacheEngine = require('../index.js');
     var fs = require('fs');
     var body;

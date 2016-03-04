@@ -3,7 +3,9 @@
   "version": "1.0.1",
   "description": "Connect middleware to compile Mustache templates",
   "scripts": {
+    "eslint": "eslint test/ index.js",
     "test": "mocha",
+    "pretest": "npm run eslint",
     "docs": "./node_modules/.bin/jsdoc index.js --recurse --destination _gh_pages/docs --readme README.md",
     "prepublish": "npm test",
     "postpublish": "node postpublish"
@@ -34,6 +36,7 @@
   "devDependencies": {
     "mocha": "2.2.5",
     "eslint": "1.2.1",
+    "eslint-config-fear-core": "git+https://github.com/digitalinnovation/fear-core-eslint-config",
     "fear-core-build" : "1.1.0",
     "fear-core-ui": "https://github.com/DigitalInnovation/fear-core-ui#develop",
     "gh-pages": "0.10.0",
