@@ -1,12 +1,14 @@
 {
   "name": "connect-mustache-middleware",
-  "version": "0.0.1",
+  "version": "1.0.1",
   "description": "Connect middleware to compile Mustache templates",
-  "directories": {
-    "test": "test"
-  },
   "scripts": {
-    "test": "mocha"
+    "eslint": "eslint test/ index.js",
+    "test": "mocha",
+    "pretest": "npm run eslint",
+    "docs": "./node_modules/.bin/jsdoc index.js --recurse --destination _gh_pages/docs --readme README.md",
+    "prepublish": "npm test",
+    "postpublish": "node postpublish"
   },
   "keywords": [
     "connect",
@@ -32,31 +34,16 @@
   ],
   "license": "ISC",
   "devDependencies": {
-    "mocha": "2.2.5"
+    "mocha": "2.2.5",
+    "eslint": "1.2.1",
+    "eslint-config-fear-core": "git+https://github.com/digitalinnovation/fear-core-eslint-config",
+    "fear-core-build" : "1.1.0",
+    "fear-core-ui": "https://github.com/DigitalInnovation/fear-core-ui#develop",
+    "gh-pages": "0.10.0",
+    "jsdoc": "3.4.0"
   },
   "dependencies": {
     "mustache": "0.8.2",
     "extend": "2.0.1"
-  },
-  "gitHead": "14a8960b90fbc158a3a7c21607560eff0c8011e2",
-  "_id": "connect-mustache-middleware@0.0.1",
-  "_shasum": "2db69dad3722a9445a87bf7a1926543e833a540b",
-  "_from": "connect-mustache-middleware@0.0.1",
-  "_npmVersion": "1.4.23",
-  "_npmUser": {
-    "name": "alex.bowen",
-    "email": "alexbowen123@googlemail.com"
-  },
-  "maintainers": [
-    {
-      "name": "alex.bowen",
-      "email": "alexbowen123@googlemail.com"
-    }
-  ],
-  "dist": {
-    "shasum": "2db69dad3722a9445a87bf7a1926543e833a540b",
-    "tarball": "http://registry.npmjs.org/connect-mustache-middleware/-/connect-mustache-middleware-0.0.1.tgz"
-  },
-  "_resolved": "https://registry.npmjs.org/connect-mustache-middleware/-/connect-mustache-middleware-0.0.1.tgz",
-  "readme": "ERROR: No README data found!"
+  }
 }

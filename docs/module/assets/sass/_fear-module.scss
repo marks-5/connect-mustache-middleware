@@ -1,0 +1,31 @@
+$fear-core-ui-sprite-image-dir: '/common/assets/images/sprites';
+$fear-core-ui-font-dir: '/module/assets/fonts';
+$fear-core-ui-images-dir: '/assets/module/images';
+
+/* Base */
+
+@import 'fear-core-ui/normalize';
+
+@import 'fear-core-ui/base';
+@import 'fear-core-ui/colors';
+@import 'fear-core-ui/extends';
+@import 'fear-core-ui/layout/grid';
+@import 'fear-core-ui/layout/content';
+@import 'fear-core-ui/layout/positioning';
+
+@import 'fear-core-ui/typography';
+
+@import 'fear-core-ui/utilities/accessability';
+
+/* Components */
+@import 'fear-core-ui/components/icons';
+@import 'fear-core-ui/components/logo';
+@import 'fear-core-ui/components/buttons';
+
+/* Layout */
+@import 'fear-core-ui/templates/header';
+@import 'fear-core-ui/templates/navigation/module_nav-header';
+@import 'fear-core-ui/components/search-bar';
+@import 'fear-core-ui/templates/navigation/module_nav-primary';
+@import 'fear-core-ui/templates/navigation/module_nav-submenu';
+

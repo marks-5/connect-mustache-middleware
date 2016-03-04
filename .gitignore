@@ -1,2 +1,7 @@
 node_modules
 .idea
+*.iml
+*.sublime-*
+*.log
+
+_gh_pages

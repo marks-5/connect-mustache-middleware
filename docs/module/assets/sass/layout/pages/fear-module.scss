@@ -1,0 +1,15 @@
+// Main CSS
+// --------------------------------------------------
+
+$browser: non-ie8;
+$channel: channel-default;
+
+@import '../../fear-module';
+
+h4 {
+  display : block
+}
+
+.highlight {
+  margin-bottom : 20px
+}

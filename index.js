@@ -1,27 +1,34 @@
-"use strict";
+/*eslint max-depth:0*/
 
-/*
- File: mustacheEngine.js
- Description:
- Connect middleware to compile requested html file as a mustache template before serving
- the response. Also allows mustache partials to be included using file system.
- Options:
- rootDir: '', //application basePath
- dataDir: '''', //location of mocked data
- datafileExt: '.json', //file extension for mocked data files.
- templateExt: '.html', //file extension for template files
- exclude : '' //pattern for requests to be excluded (similar to RewriteCondition)
+'use strict';
+
+/**
+ * File: mustacheEngine.js
+ * Description:
+ * Connect middleware to compile requested html file as a mustache template before serving
+ * the response. Also allows mustache partials to be included using file system.
  */
 
 var fs = require('fs');
-var path = require('path');
 var Mustache = require('mustache');
 var extend = require('extend');
 var util = require('util');
 
 var MustacheEngine = {
 
-    // options property
+    /**
+     * options
+     * rootDir: ''
+     * application basePath
+     * dataDir: ''
+     * location of mocked data
+     * datafileExt: '.json'
+     * file extension for mocked data files.
+     * templateExt: '.html'
+     * file extension for template files
+     * exclude : ''
+     * pattern for requests to be excluded (similar to RewriteCondition)
+     */
     options: {
         rootDir: '',
         dataDir: '',
@@ -44,35 +51,29 @@ var MustacheEngine = {
 
     excludeFlags: ['NO_CACHE'],
 
-    /*
-     Function: setOptions
-     Set options for mustache engine
-     Params:
-     - options: key/value options
-     Returns: NA
+    /**
+     * setOptions
+     * Set options for mustache engine
+     * @param options
      */
     setOptions: function (options) {
         extend(this.options, options);
     },
 
-    /*
-     Function: setDefaults
-     Set defaults for mustache engine
-     Params:
-     - defaults: key/value defaults
-     Returns: NA
+    /**
+     * setDefaults
+     * Set defaults for mustache engine
+     * @param defaults
      */
     setDefaults: function (defaults) {
         this.defaults = defaults;
     },
 
-    /*
-     Function: parseRequestHtml
-     Parse body html for include fragments and
-     optional data to be rendered with
-     Params:
-     - body: HTML string
-     Returns: string
+    /**
+     * parseRequestHtml
+     * Parse body html for include fragments and optional data to be rendered with
+     * @param body
+     * @returns {*}
      */
     parseRequestHtml: function (body) {
 
@@ -103,6 +104,11 @@ var MustacheEngine = {
         return body;
     },
 
+    /**
+     * removeMustacheSyntax
+     * @param text
+     * @returns {*}
+     */
     removeMustacheSyntax: function (text) {
         return text
             .replace(/\s/g, '')
@@ -110,45 +116,51 @@ var MustacheEngine = {
             .replace(/\s*\{{2,3}>/, '');
     },
 
+    /**
+     * excludeFlagMatch
+     * @param text
+     * @returns {boolean}
+     */
     excludeFlagMatch: function (text) {
         return this.excludeFlags.indexOf(text) > -1;
     },
 
-    /*
-     Function: compileTemplates
-     Compile all templates with associated data or without data if none specified
-     Returns: NA
+    /**
+     * compileTemplates
+     * Compile all templates with associated data or without data if none specified
      */
     compileTemplates: function () {
 
         var partial, content;
 
         for (var p in this.partials) {
+            if (this.partials.hasOwnProperty(p)) {
+                partial = this.partials[p];
 
-            partial = this.partials[p];
+                if (partial.data) {
 
-            if (partial.data) {
+                    for (var d in this.staticData) {
+                        if (this.staticData.hasOwnProperty(d)) {
+                            partial.data[d] = this.staticData[d];
+                        }
+                    }
 
-                for (var d in this.staticData) {
-                    partial.data[d] = this.staticData[d];
+                    content = Mustache.render(partial.content, partial.data);
+                } else {
+                    //compile with static data only
+                    content = Mustache.render(partial.content, this.staticData);
                 }
 
-                content = Mustache.render(partial.content, partial.data);
-            } else {
-                //compile with static data only
-                content = Mustache.render(partial.content, this.staticData);
+                this.partials[p].content = content;
             }
-
-            this.partials[p].content = content;
         }
     },
 
-    /*
-     Function: replacePartials
-     replace partial syntax with rendered templates
-     Params:
-     - body: HTML string
-     Returns: string
+    /**
+     * replacePartials
+     * replace partial syntax with rendered templates
+     * @param body
+     * @returns {*}
      */
     replacePartials: function (body) {
 
@@ -165,12 +177,12 @@ var MustacheEngine = {
         return body;
     },
 
-    /*
-     Function: getPartialFileContent
-     Params:
-     - fileName: string
-     - config: Configuration object from this.staticData
-     Returns: string
+    /**
+     * getPartialFileContent
+     * @param fileName
+     * @param config
+     * Configuration object from this.staticData
+     * @returns {string}
      */
     getPartialFile: function (fileName, config) {
 
@@ -200,29 +212,38 @@ var MustacheEngine = {
         return fileContent;
     },
 
+    /**
+     * getPathOveride
+     * @param path
+     * @returns {*}
+     */
     getPathOveride : function (path) {
 
         var parts = path.split('/');
 
-        return this.options.templatePathOverides[parts[0]]
+        return this.options.templatePathOverides[parts[0]];
     },
 
+    /**
+     * replacePathOveride
+     * @param path
+     * @returns {*}
+     */
     replacePathOveride : function (path) {
 
         var parts = path.split('/');
 
         if (this.options.templatePathOverides[parts[0]]) {
-            path = path.replace(parts[0], this.options.templatePathOverides[parts[0]])
+            path = path.replace(parts[0], this.options.templatePathOverides[parts[0]]);
         }
 
         return path;
     },
 
-    /*
-     Function: getPartialData
-     Params:
-     - fileName: string
-     Returns: JSON string
+    /**
+     * getPartialData
+     * @param fileName {String}
+     * @returns {*}
      */
     getPartialDataFile: function (fileName) {
 
@@ -237,11 +258,10 @@ var MustacheEngine = {
         return fileContent;
     },
 
-    /*
-     Function: parsePartialFileName
-     Params:
-     - identifier: string
-     Returns: string
+    /**
+     * parsePartialFileName
+     * @param identifier {String}
+     * @returns {*}
      */
     parsePartialFileName: function (identifier) {
 
@@ -254,11 +274,10 @@ var MustacheEngine = {
         return fileName;
     },
 
-    /*
-     Function: parsePartialDataFileName
-     Params:
-     - identifier: string
-     Returns: string
+    /**
+     * parsePartialDataFileName
+     * @param identifier
+     * @returns {*}
      */
     parsePartialDataFileName: function (identifier) {
 
@@ -271,12 +290,12 @@ var MustacheEngine = {
         return fileName;
     },
 
-    /*
-     Function: getPartialFileContent
-     Params:
-     - identifier: string
-     - config: Configuration object from this.staticData
-     Returns: string
+    /**
+     * getPartialFileContent
+     * @param identifier {String}
+     * @param config
+     * Configuration object from this.staticData
+     * @returns {*|string}
      */
     getPartialContent: function (identifier, config) {
 
@@ -288,29 +307,26 @@ var MustacheEngine = {
         return content;
     },
 
-    /*
-     Function: getPartialData
-     Params:
-     - identifier: string
-     Returns: JSON string
+    /**
+     * getPartialData
+     * @param identifier {string}
+     * @returns {*}
      */
     getPartialData: function (identifier) {
 
         var fileName;
 
-        if (!identifier) return false;
+        if (!identifier) {
+            return false;
+        }
 
         fileName = this.parsePartialDataFileName(identifier);
 
         return this.getPartialDataFile(fileName);
     },
 
-    /*
-     Function: includePartials
-     Returns main Mustache template by including all partials mentioned in the HTML content
-     Params:
-     - body: HTML content contains partials syntax to include other files.
-     Returns: Mustache Template
+    /**
+     * includePartials
      */
     includePartials: function () {
 
@@ -320,51 +336,48 @@ var MustacheEngine = {
         // replace all appearance of partials ({{> file}}) with actual file contents
         for (var p in this.partials) {
 
-            content = this.partials[p].content;
+            if (this.partials.hasOwnProperty(p)) {
+                content = this.partials[p].content;
 
-            do {
-                matches = content.match(this.regex.partial) || [];
+                do {
+                    matches = content.match(this.regex.partial) || [];
 
-                if (matches) {
-                    for (var i = 0; i < matches.length; i++) {
-                        content = content.replace(matches[i], this.getPartialContent(matches[i]), this.staticData.config);
+                    if (matches) {
+                        for (var i = 0; i < matches.length; i++) {
+                            content = content.replace(matches[i], this.getPartialContent(matches[i]), this.staticData.config);
+                        }
                     }
-                }
 
-            } while (matches && matches.length > 0);
+                } while (matches && matches.length > 0);
 
-            this.partials[p].content = content;
+                this.partials[p].content = content;
+            }
         }
     },
 
-    /*
-     Function: getChannel
-     Gets the query string value for channel
-     Params:
-     - query: connect middleware query string
-     Returns: 'default' value if query string param not present or param value does not match defaults.CHANNEL else param value
+    /**
+     * getChannel
+     * @param channel
+     * @returns {*|string}
      */
-    getChannel: function (query) {
-        var value = (query.channel || this.defaults.CHANNEL.DEFAULT).toLowerCase();
-
-        if (value !== this.defaults.CHANNEL.DEFAULT && value !== this.defaults.CHANNEL.TSOP && value !== this.defaults.CHANNEL.BUSER && value !== this.defaults.CHANNEL.CFTO) {
-            value = this.defaults.CHANNEL.DEFAULT;
-        }
-
-        return value;
+    getChannel: function (channel) {
+        return channel || this.defaults.CHANNEL.DEFAULT.toLowerCase();
     },
 
-    /*
-     Function: getChannel
-     Gets page path of request
-     Params:
-     - req: express req
-     Returns: pathname from express req.
+    /**
+     * getPagePath
+     * @param req
+     * @returns {*}
      */
     getPagePath: function (req) {
         return req._parsedUrl.pathname.replace(/^\/|\/$/g, '');
     },
 
+    /**
+     * getPageParams
+     * @param req
+     * @returns {{}}
+     */
     getPageParams: function (req) {
 
         var query = req._parsedUrl.query,
@@ -378,7 +391,7 @@ var MustacheEngine = {
                 var splitParam = params[i].split('=');
 
                 if (splitParam.length === 2) {
-                    returnParams[splitParam[0]] = splitParam[1]
+                    returnParams[splitParam[0]] = splitParam[1];
                 }
             }
         }
@@ -386,42 +399,54 @@ var MustacheEngine = {
         return returnParams;
     },
 
-    /*
-     Function: setStaticData
-     configures static data used by Mustache engine
-     Params:
-     - channel: channel type
-     Returns: N/A
+    /**
+     * setStaticData
+     * configures static data used by Mustache engine
+     * @param channel
+     * @param pagePath
      */
     setStaticData: function (channel, pagePath) {
 
         for (var t in this.options.staticDataTypes) {
 
-            var dataType = this.options.staticDataTypes[t];
-            var setting = this.defaults.get(channel, dataType);
+            if (this.options.staticDataTypes.hasOwnProperty(t)) {
 
-            this.staticData[dataType] = setting;
+                var dataType = this.options.staticDataTypes[t];
+                var setting = this.defaults.get(channel, dataType);
 
-            if (dataType === this.options.staticDataTypes.CHECKOUT_HEADER) {
-                this.staticData[dataType] = setting[pagePath];
+                this.staticData[dataType] = setting;
+
+                if (dataType === this.options.staticDataTypes.CHECKOUT_HEADER) {
+                    this.staticData[dataType] = setting[pagePath];
+
+                }
             }
         }
     },
 
+    /**
+     * swapMappers
+     * @param template
+     * @param oldMapper
+     * @param newMapper
+     * @returns {*}
+     */
     swapMappers: function (template, oldMapper, newMapper) {
 
-        var mapper = new RegExp(oldMapper, 'gi'),
-            template = template.replace(mapper, newMapper);
+        var mapper = new RegExp(oldMapper, 'gi');
+
+        template = template.replace(mapper, newMapper);
 
         return template;
     },
 
-    /*
-     Function: middleware
-     Connect middleware function to  compile requested file as mustache template before serving response.
-     Params:
-     - options: key/value options settings for middleware
-     Returns: NA
+    /**
+     * middleware
+     * Connect middleware function to  compile requested file as mustache template before serving response.
+     * @param options
+     * key/value options settings for middleware
+     * @param defaults
+     * @returns {Function}
      */
     middleware: function (options, defaults) {
 
@@ -438,9 +463,9 @@ var MustacheEngine = {
                 return next();
             }
 
-            var channel = MustacheEngine.getChannel(req.query);
             var pagePath = MustacheEngine.getPagePath(req);
             var pageParams = MustacheEngine.getPageParams(req);
+            var channel = MustacheEngine.getChannel(pageParams.channel);
 
             MustacheEngine.setStaticData(channel, pagePath);
 
@@ -472,7 +497,7 @@ var MustacheEngine = {
                         res.writeHead(500, {'Content-Type': 'text/plain'});
                     }
 
-                    console.dir(e);
+                    process.stdout.write(e);
                     return write.call(res, e.message);
                 }
             };
