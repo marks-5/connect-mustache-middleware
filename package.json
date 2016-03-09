@@ -40,7 +40,8 @@
     "fear-core-build" : "1.1.0",
     "fear-core-ui": "git+https://github.com/DigitalInnovation/fear-core-ui#develop",
     "gh-pages": "0.10.0",
-    "jsdoc": "3.4.0"
+    "jsdoc": "3.4.0",
+    "sinon": "1.14.1"
   },
   "dependencies": {
     "mustache": "0.8.2",

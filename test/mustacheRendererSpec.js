@@ -3,6 +3,7 @@
 describe('MustacheEngine', function() {
 
     var assert = require('assert');
+    var sinon = require('sinon');
     var mustacheEngine = require('../index.js');
     var fs = require('fs');
     var body;
@@ -74,6 +75,51 @@ describe('MustacheEngine', function() {
 
             assert.equal(mustacheEngine.partials['views/footer'].data, null);
             assert.equal(mustacheEngine.partials['views/footer'].content, '<h2>{{footerData}}</h2>');
+        });
+    });
+
+    describe('Method: getPartialFile', function() {
+
+        beforeEach(function() {
+            mustacheEngine.setOptions({
+                rootDir: './test/demo/rootDir',
+                dataDir: './test/demo/dataDir',
+                datafileExt: '.json',
+                templateExt: '.html',
+                exclude : 'command'
+            });
+        });
+
+        it('should look at the default rootDir when called without args', function() {
+            assert.equal(mustacheEngine.getPartialFile('views/header.html', {}), '<h2>{{headerData}}</h2>');
+        });
+
+        it('should look in the site directory if siteName is present in application', function() {
+
+            var stubGetSiteName = sinon.stub(mustacheEngine, 'getSiteName', function() {
+                return 'cfto';
+            });
+            assert.equal(mustacheEngine.getPartialFile('views/header.html', {}), '<h2>I have been overriden</h2>');
+
+            // revert the stub - so we can test the default settings
+            stubGetSiteName.restore();
+        });
+
+        it('should inherit from the default directory if siteName is present but the partial is not in the siteName directory', function() {
+
+            var stubGetSiteName = sinon.stub(mustacheEngine, 'getSiteName', function() {
+                return 'cfto';
+            });
+            assert.equal(mustacheEngine.getPartialFile('views/footer.html', {}), '<h2>{{footerData}}</h2>');
+
+            // revert the stub - so we can test the default settings
+            stubGetSiteName.restore();
+        });
+
+        it('should throw an exception when a partial is not found', function() {
+            assert.throws(function() {
+                mustacheEngine.getPartialFile('views/wtf.html', {});
+            });
         });
     });
 

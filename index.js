@@ -182,13 +182,12 @@ var MustacheEngine = {
      * Function: getSiteName
      * @returns: string (site name ie. cfto)
      */
-
     getSiteName: function () {
         return argv.site ? argv.site : '';
     },
 
     /**
-     * getPartialFileContent
+     * getPartialFile
      * @param fileName
      * @param config
      * Configuration object from this.staticData
