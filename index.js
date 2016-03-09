@@ -178,10 +178,10 @@ var MustacheEngine = {
 
         return body;
     },
-    /*
-      Function: getSiteName
-      Returns: string (site name ie. cfto)
-    */
+    /**
+     * Function: getSiteName
+     * @returns: string (site name ie. cfto)
+     */
 
     getSiteName: function () {
         return argv.site ? argv.site : '';

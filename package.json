@@ -44,6 +44,7 @@
   },
   "dependencies": {
     "mustache": "0.8.2",
-    "extend": "2.0.1"
+    "extend": "2.0.1",
+    "yargs": "4.2.0"
   }
 }
