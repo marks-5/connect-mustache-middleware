@@ -13,6 +13,8 @@ var fs = require('fs');
 var Mustache = require('mustache');
 var extend = require('extend');
 var util = require('util');
+var argv = require('yargs').argv;
+var path = require('path');
 
 var MustacheEngine = {
 
@@ -176,6 +178,14 @@ var MustacheEngine = {
 
         return body;
     },
+    /**
+     * Function: getSiteName
+     * @returns: string (site name ie. cfto)
+     */
+
+    getSiteName: function () {
+        return argv.site ? argv.site : '';
+    },
 
     /**
      * getPartialFileContent
@@ -187,26 +197,30 @@ var MustacheEngine = {
     getPartialFile: function (fileName, config) {
 
         var fileContent = '',
-            path = fileName,
-            fileExist = true;
+            filePath = fileName,
+            fileExist = true,
+            fileOnPath = true;
 
         try {
-            if (path.search(this.regex.placeHolder) >= 0) {
-                path = util.format(fileName, config.channel);
+            if (filePath.search(this.regex.placeHolder) >= 0) {
+                filePath = util.format(fileName, config.channel);
 
-                fileExist = fs.existsSync(this.options.rootDir + '/' + path);
+                fileExist = fs.existsSync(this.options.rootDir + '/' + filePath);
             }
 
+            fileOnPath = fs.existsSync(path.join(this.options.rootDir, this.getSiteName(), filePath));
+            filePath = fileOnPath ? path.join(this.getSiteName(), filePath) : filePath;
+
             if (fileExist) {
-                if (this.getPathOveride(path)) {
-                    fileContent = fs.readFileSync(this.replacePathOveride(path), 'utf8');
+                if (this.getPathOveride(filePath)) {
+                    fileContent = fs.readFileSync(this.replacePathOveride(filePath), 'utf8');
                 } else {
-                    fileContent = fs.readFileSync(this.options.rootDir + '/' + path, 'utf8');
+                    fileContent = fs.readFileSync(this.options.rootDir + '/' + filePath, 'utf8');
                 }
             }
 
         } catch (e) {
-            throw new Error('Partial file not found: ' + path);
+            throw new Error('Partial file not found: ' + filePath);
         }
 
         return fileContent;

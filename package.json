@@ -38,12 +38,13 @@
     "eslint": "1.2.1",
     "eslint-config-fear-core": "git+https://github.com/digitalinnovation/fear-core-eslint-config",
     "fear-core-build" : "1.1.0",
-    "fear-core-ui": "https://github.com/DigitalInnovation/fear-core-ui#develop",
+    "fear-core-ui": "git+https://github.com/DigitalInnovation/fear-core-ui#develop",
     "gh-pages": "0.10.0",
     "jsdoc": "3.4.0"
   },
   "dependencies": {
     "mustache": "0.8.2",
-    "extend": "2.0.1"
+    "extend": "2.0.1",
+    "yargs": "4.2.0"
   }
 }
