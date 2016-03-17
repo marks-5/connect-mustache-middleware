@@ -34,7 +34,6 @@ var MustacheEngine = {
     options: {
         rootDir: '',
         dataDir: '',
-        templatePathOverides : '',
         datafileExt: '.json',
         templateExt: '.html',
         exclude: '',
@@ -211,11 +210,7 @@ var MustacheEngine = {
             filePath = fileOnPath ? path.join(this.getSiteName(), filePath) : filePath;
 
             if (fileExist) {
-                if (this.getPathOveride(filePath)) {
-                    fileContent = fs.readFileSync(this.replacePathOveride(filePath), 'utf8');
-                } else {
-                    fileContent = fs.readFileSync(this.options.rootDir + '/' + filePath, 'utf8');
-                }
+                fileContent = fs.readFileSync(this.options.rootDir + '/' + filePath, 'utf8');
             }
 
         } catch (e) {
@@ -223,34 +218,6 @@ var MustacheEngine = {
         }
 
         return fileContent;
-    },
-
-    /**
-     * getPathOveride
-     * @param path
-     * @returns {*}
-     */
-    getPathOveride : function (path) {
-
-        var parts = path.split('/');
-
-        return this.options.templatePathOverides[parts[0]];
-    },
-
-    /**
-     * replacePathOveride
-     * @param path
-     * @returns {*}
-     */
-    replacePathOveride : function (path) {
-
-        var parts = path.split('/');
-
-        if (this.options.templatePathOverides[parts[0]]) {
-            path = path.replace(parts[0], this.options.templatePathOverides[parts[0]]);
-        }
-
-        return path;
     },
 
     /**
