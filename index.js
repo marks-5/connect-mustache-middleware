@@ -443,12 +443,17 @@ var MustacheEngine = {
      * @param oldMapper
      * @param newMapper
      * @returns {*}
+     *
+     * replaces both references to the original mapper file,
+     * and the escaped mapper file
      */
     swapMappers: function (template, oldMapper, newMapper) {
 
-        var mapper = new RegExp(oldMapper, 'gi');
+        var dataRegex = new RegExp('(\\b' + oldMapper + '\\b)'),
+            mapperRegex = new RegExp('(\\b' + oldMapper + '_MAPPER\\b)');
 
-        template = template.replace(mapper, newMapper);
+        template = template.replace(dataRegex, newMapper);
+        template = template.replace(mapperRegex, newMapper + '_MAPPER');
 
         return template;
     },

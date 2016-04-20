@@ -8,6 +8,22 @@ describe('MustacheEngine', function() {
     var fs = require('fs');
     var body;
 
+    describe('swapMappers', function() {
+
+        it('should swap the data mappers in the template', function() {
+
+            var template = 'MS_RES_PDP_HEADER | MS_RES_PDP | MS_RES_PDP_MAPPER |',
+                oldMapper = 'MS_RES_PDP',
+                newMapper = 'MS_NEW',
+                replacedMapper = 'MS_RES_PDP_HEADER | MS_NEW | MS_NEW_MAPPER |';
+
+            assert.equal(
+                mustacheEngine.swapMappers(template, oldMapper, newMapper),
+                replacedMapper
+            );
+        });
+    });
+
     describe('setOptions', function() {
 
         it('should extend default options if passed', function() {
