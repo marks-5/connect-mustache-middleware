@@ -196,30 +196,31 @@ var MustacheEngine = {
     getPartialFile: function (fileName, config) {
 
         var fileContent = '',
-            filePath = fileName,
             fileExist = true,
             fileOnPath = true;
 
         try {
-            if (filePath.search(this.regex.placeHolder) >= 0) {
-                filePath = util.format(fileName, config.channel);
+            if (fileName.search(this.regex.placeHolder) >= 0) {
+                fileName = util.format(fileName, config.channel);
 
-                fileExist = fs.existsSync(this.options.rootDir + '/' + filePath);
+                fileExist = fs.existsSync(this.options.rootDir + '/' + fileName);
             }
 
-            fileOnPath = fs.existsSync(path.join(this.options.rootDir, this.getSiteName(), filePath));
-            filePath = fileOnPath ? path.join(this.getSiteName(), filePath) : filePath;
+            fileOnPath = fs.existsSync(path.join(this.options.rootDir, this.getSiteName(), fileName));
+            fileName = fileOnPath ? path.join(this.getSiteName(), fileName) : fileName;
 
             if (fileExist) {
-                fileContent = fs.readFileSync(this.options.rootDir + '/' + filePath, 'utf8');
+                fileContent = fs.readFileSync(this.options.rootDir + '/' + fileName, 'utf8');
             }
 
         } catch (e) {
-            throw new Error('Partial file not found: ' + filePath);
+            throw new Error('Partial file not found: ' + fileName);
         }
 
         return fileContent;
     },
+
+
 
     /**
      * getPartialData
