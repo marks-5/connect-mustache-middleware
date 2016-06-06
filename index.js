@@ -3,9 +3,8 @@
 'use strict';
 
 /**
- * File: mustacheEngine.js
- * Description:
- * Connect middleware to compile requested html file as a mustache template before serving
+ * @module mustacheEngine
+ * @description Connect middleware to compile requested html file as a mustache template before serving
  * the response. Also allows mustache partials to be included using file system.
  */
 
@@ -20,16 +19,26 @@ var MustacheEngine = {
 
     /**
      * options
-     * rootDir: ''
-     * application basePath
-     * dataDir: ''
-     * location of mocked data
-     * datafileExt: '.json'
-     * file extension for mocked data files.
-     * templateExt: '.html'
-     * file extension for template files
-     * exclude : ''
-     * pattern for requests to be excluded (similar to RewriteCondition)
+     *
+     * @property rootDir
+     * @default ''
+     * @description application basePath
+     *
+     * @property dataDir
+     * @default ''
+     * @description location of mocked data
+     *
+     * @property datafileExt
+     * @default '.json'
+     * @description file extension for mocked data files.
+     *
+     * @property templateExt
+     * @default '.html'
+     * @description file extension for template files
+     *
+     * @property exclude
+     * @default ''
+     * @description pattern for requests to be excluded (similar to RewriteCondition)
      */
     options: {
         rootDir: '',
@@ -55,7 +64,7 @@ var MustacheEngine = {
 
     /**
      * setOptions
-     * Set options for mustache engine
+     * @description Set options for mustache engine
      * @param options
      */
     setOptions: function (options) {
@@ -64,7 +73,7 @@ var MustacheEngine = {
 
     /**
      * setDefaults
-     * Set defaults for mustache engine
+     * @description Set defaults for mustache engine
      * @param defaults
      */
     setDefaults: function (defaults) {
@@ -73,7 +82,7 @@ var MustacheEngine = {
 
     /**
      * parseRequestHtml
-     * Parse body html for include fragments and optional data to be rendered with
+     * @description Parse body html for include fragments and optional data to be rendered with
      * @param body
      * @returns {*}
      */
@@ -129,7 +138,7 @@ var MustacheEngine = {
 
     /**
      * compileTemplates
-     * Compile all templates with associated data or without data if none specified
+     * @description Compile all templates with associated data or without data if none specified
      */
     compileTemplates: function () {
 
@@ -160,7 +169,7 @@ var MustacheEngine = {
 
     /**
      * replacePartials
-     * replace partial syntax with rendered templates
+     * @description replace partial syntax with rendered templates
      * @param body
      * @returns {*}
      */
@@ -179,7 +188,7 @@ var MustacheEngine = {
         return body;
     },
     /**
-     * Function: getSiteName
+     * getSiteName
      * @returns: string (site name ie. cfto)
      */
     getSiteName: function () {
@@ -188,39 +197,82 @@ var MustacheEngine = {
 
     /**
      * getPartialFile
+     * @description if template exists for specified site then use that else use default and return the file content
      * @param fileName
-     * @param config
-     * Configuration object from this.staticData
+     * @param channel
      * @returns {string}
      */
-    getPartialFile: function (fileName, config) {
+    getPartialFile: function (fileName, channel) {
 
-        var fileContent = '',
-            fileExist = true,
-            fileOnPath = true;
+        var fileContent = '';
+        var filePath;
+
+        filePath = this.fileExistsOnPath(this.getSiteFilePath(fileName, channel))
+            ? this.getSiteFilePath(fileName, channel)
+            : this.getDefaultFilePath(fileName, channel);
 
         try {
-            if (fileName.search(this.regex.placeHolder) >= 0) {
-                fileName = util.format(fileName, config.channel);
-
-                fileExist = fs.existsSync(this.options.rootDir + '/' + fileName);
-            }
-
-            fileOnPath = fs.existsSync(path.join(this.options.rootDir, this.getSiteName(), fileName));
-            fileName = fileOnPath ? path.join(this.getSiteName(), fileName) : fileName;
-
-            if (fileExist) {
-                fileContent = fs.readFileSync(this.options.rootDir + '/' + fileName, 'utf8');
-            }
-
+            fileContent = this.readFileContent(filePath, 'utf8');
         } catch (e) {
-            throw new Error('Partial file not found: ' + fileName);
+            throw new Error('Partial file not found: ' + filePath);
         }
 
         return fileContent;
     },
 
+    /**
+     * getDefaultFilePath
+     * @param fileName
+     * @param channel
+     * @returns {*}
+     */
+    getDefaultFilePath: function (fileName, channel) {
+        return this.replacePlaceHolderInPath(fileName, channel);
+    },
 
+    /**
+     * getSiteFilePath
+     * @param fileName
+     * @param channel
+     * @returns {string|*}
+     */
+    getSiteFilePath: function (fileName, channel) {
+        return path.join(this.getSiteName(), this.replacePlaceHolderInPath(fileName, channel));
+    },
+
+    /**
+     * replacePlaceHolderInPath
+     * @param fileName
+     * @param toReplace
+     * @returns {*}
+     */
+    replacePlaceHolderInPath: function(fileName, toReplace) {
+
+        if (fileName.search(this.regex.placeHolder) >= 0) {
+            fileName = util.format(fileName, toReplace);
+        }
+
+        return fileName;
+    },
+
+    /**
+     * readFileContent
+     * @param filePath
+     * @param encoding
+     * @returns {*}
+     */
+    readFileContent: function (filePath, encoding) {
+        return fs.readFileSync(path.join(this.options.rootDir, filePath), encoding);
+    },
+
+    /**
+     * readFileContent
+     * @param filePath
+     * @returns {*}
+     */
+    fileExistsOnPath: function (filePath) {
+        return fs.existsSync(path.join(this.options.rootDir, filePath));
+    },
 
     /**
      * getPartialData
@@ -276,15 +328,16 @@ var MustacheEngine = {
      * getPartialFileContent
      * @param identifier {String}
      * @param config
-     * Configuration object from this.staticData
+     * @description Configuration object from this.staticData
      * @returns {*|string}
      */
     getPartialContent: function (identifier, config) {
 
         var fileName, content;
+        var channel = config ? config.channel : '';
 
         fileName = this.parsePartialFileName(identifier);
-        content = this.getPartialFile(fileName, config);
+        content = this.getPartialFile(fileName, channel);
 
         return content;
     },
@@ -383,7 +436,7 @@ var MustacheEngine = {
 
     /**
      * setStaticData
-     * configures static data used by Mustache engine
+     * @description configures static data used by Mustache engine
      * @param channel
      * @param pagePath
      */
@@ -429,9 +482,9 @@ var MustacheEngine = {
 
     /**
      * middleware
-     * Connect middleware function to  compile requested file as mustache template before serving response.
+     * @description Connect middleware function to  compile requested file as mustache template before serving response.
      * @param options
-     * key/value options settings for middleware
+     * @description key/value options settings for middleware
      * @param defaults
      * @returns {Function}
      */
