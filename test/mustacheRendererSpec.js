@@ -8,8 +8,21 @@ describe('MustacheEngine', function() {
     var fs = require('fs');
     var body;
 
-    describe('swapMappers', function() {
+    function setOptions () {
+        mustacheEngine.setOptions({
+            rootDir: './test/demo/rootDir',
+            dataDir: './test/demo/dataDir',
+            datafileExt: '.json',
+            templateExt: '.html',
+            exclude : 'command'
+        });
+    }
 
+    beforeEach(function() {
+        setOptions();
+    });
+
+    describe('swapMappers', function() {
         it('should swap the data mappers in the template', function() {
 
             var template = 'MS_RES_PDP_HEADER | MS_RES_PDP | MS_RES_PDP_MAPPER |',
@@ -25,36 +38,14 @@ describe('MustacheEngine', function() {
     });
 
     describe('setOptions', function() {
-
         it('should extend default options if passed', function() {
-
-            mustacheEngine.setOptions({
-                rootDir: 'x',
-                dataDir: 'y',
-                datafileExt: '.json',
-                templateExt: '.html',
-                exclude : 'command'
-            });
-
-            assert.equal(mustacheEngine.options.rootDir, 'x');
-            assert.equal(mustacheEngine.options.dataDir, 'y');
             assert.equal(mustacheEngine.options.datafileExt, '.json');
             assert.equal(mustacheEngine.options.templateExt, '.html');
-
-            mustacheEngine.setOptions({
-                rootDir: './test/demo/rootDir',
-                dataDir: './test/demo/dataDir',
-                datafileExt: '.json',
-                templateExt: '.html',
-                exclude : 'command'
-            });
-
-            assert.equal(mustacheEngine.options.datafileExt, '.json');
+            assert.equal(mustacheEngine.options.exclude, 'command');
         });
     });
 
     describe('Method: parsePartialFileName', function() {
-
         it('should match string and return file path', function() {
 
             assert.equal(mustacheEngine.parsePartialFileName('views/content'), 'views/content.html');
@@ -66,7 +57,6 @@ describe('MustacheEngine', function() {
     });
 
     describe('Method: parsePartialDataFileName', function() {
-
         it('should match data and return JSON data filename', function() {
 
             assert.equal(mustacheEngine.parsePartialDataFileName('helloWorld'), 'helloWorld' + mustacheEngine.options.datafileExt);
@@ -76,7 +66,6 @@ describe('MustacheEngine', function() {
     });
 
     describe('Method: parseRequestHtml', function() {
-
         it('should match data and return JSON data filename', function() {
 
             body = fs.readFileSync(mustacheEngine.options.rootDir + '/index.html', 'utf8');
@@ -94,18 +83,25 @@ describe('MustacheEngine', function() {
         });
     });
 
-    describe('Method: getPartialFile', function() {
+    describe('Method: replacePlaceHolderInPath', function() {
+        it('should replace placeholder if it exists (e.g %s) with value', function() {
+            assert.equal(mustacheEngine.replacePlaceHolderInPath('test/%s/path', 'cfto'), 'test/cfto/path');
+            assert.equal(mustacheEngine.replacePlaceHolderInPath('test/%t/path', 'cfto'), 'test/%t/path');
+            assert.equal(mustacheEngine.replacePlaceHolderInPath('test/path', 'cfto'), 'test/path');
+        });
+    });
 
-        beforeEach(function() {
-            mustacheEngine.setOptions({
-                rootDir: './test/demo/rootDir',
-                dataDir: './test/demo/dataDir',
-                datafileExt: '.json',
-                templateExt: '.html',
-                exclude : 'command'
-            });
+    describe('Method: fileExistsOnPath', function() {
+        it('should return true if file exists', function() {
+            assert.equal(mustacheEngine.fileExistsOnPath('views/header.html'), true);
         });
 
+        it('should return false if file doesn\'t exist', function() {
+            assert.equal(mustacheEngine.fileExistsOnPath('views/xyz.html'), false);
+        });
+    });
+
+    describe('Method: getPartialFile', function() {
         it('should look at the default rootDir when called without args', function() {
             assert.equal(mustacheEngine.getPartialFile('views/header.html', {}), '<h2>{{headerData}}</h2>');
         });
@@ -115,6 +111,7 @@ describe('MustacheEngine', function() {
             var stubGetSiteName = sinon.stub(mustacheEngine, 'getSiteName', function() {
                 return 'cfto';
             });
+
             assert.equal(mustacheEngine.getPartialFile('views/header.html', {}), '<h2>I have been overriden</h2>');
 
             // revert the stub - so we can test the default settings
@@ -126,6 +123,7 @@ describe('MustacheEngine', function() {
             var stubGetSiteName = sinon.stub(mustacheEngine, 'getSiteName', function() {
                 return 'cfto';
             });
+
             assert.equal(mustacheEngine.getPartialFile('views/footer.html', {}), '<h2>{{footerData}}</h2>');
 
             // revert the stub - so we can test the default settings
@@ -140,9 +138,7 @@ describe('MustacheEngine', function() {
     });
 
     describe('Method: removeMustacheSyntax', function() {
-
         it('should remove mustache syntax from a string', function() {
-
             assert.equal(mustacheEngine.removeMustacheSyntax('{{> xyz}}'), 'xyz');
             assert.equal(mustacheEngine.removeMustacheSyntax('{{> xyz | abc}}'), 'xyz|abc');
             assert.equal(mustacheEngine.removeMustacheSyntax('{{> xyz | abc | NO_CACHE}}'), 'xyz|abc|NO_CACHE');
@@ -156,7 +152,6 @@ describe('MustacheEngine', function() {
     });
 
     describe('Method: compileTemplates', function() {
-
         it('should compile into the template if data is present', function() {
             mustacheEngine.compileTemplates();
 
@@ -168,7 +163,6 @@ describe('MustacheEngine', function() {
 
 
     describe('Method: replacePartials', function() {
-
         it('should correctly replace partial syntax in html', function() {
             body = mustacheEngine.replacePartials(body);
 
@@ -177,7 +171,6 @@ describe('MustacheEngine', function() {
     });
 
     describe('Method: excludeFlagMatch', function() {
-
         it('should correctly replace partial syntax in html if eclude flag is present', function() {
             mustacheEngine.excludeFlags = ['TEST_FLAG', 'OTHER_TEST_FLAG'];
             assert.equal(mustacheEngine.excludeFlagMatch('TEST_FLAG'), true);
