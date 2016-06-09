@@ -10,7 +10,7 @@ describe('MustacheEngine', function() {
 
     function setOptions () {
         mustacheEngine.setOptions({
-            rootDir: './test/demo/rootDir',
+            rootDir: ['./test/demo/rootDir'],
             dataDir: './test/demo/dataDir',
             datafileExt: '.json',
             templateExt: '.html',
@@ -23,6 +23,7 @@ describe('MustacheEngine', function() {
     });
 
     describe('swapMappers', function() {
+
         it('should swap the data mappers in the template', function() {
 
             var template = 'MS_RES_PDP_HEADER | MS_RES_PDP | MS_RES_PDP_MAPPER |',
@@ -68,7 +69,7 @@ describe('MustacheEngine', function() {
     describe('Method: parseRequestHtml', function() {
         it('should match data and return JSON data filename', function() {
 
-            body = fs.readFileSync(mustacheEngine.options.rootDir + '/index.html', 'utf8');
+            body = fs.readFileSync(mustacheEngine.options.rootDir[0] + '/index.html', 'utf8');
 
             mustacheEngine.parseRequestHtml(body);
 
@@ -93,11 +94,20 @@ describe('MustacheEngine', function() {
 
     describe('Method: fileExistsOnPath', function() {
         it('should return true if file exists', function() {
-            assert.equal(mustacheEngine.fileExistsOnPath('views/header.html'), true);
+            assert.equal(mustacheEngine.fileExistsOnPath('views/header.html', mustacheEngine.options.rootDir[0]), true);
         });
 
         it('should return false if file doesn\'t exist', function() {
-            assert.equal(mustacheEngine.fileExistsOnPath('views/xyz.html'), false);
+            assert.equal(mustacheEngine.fileExistsOnPath('views/xyz.html', mustacheEngine.options.rootDir[0]), false);
+        });
+    });
+
+    describe('Method: replacePathParameters', function() {
+        it('should replace placeholder from placeholders property if exact match in filePath', function() {
+            mustacheEngine.setPlaceHolders({module : 'search'});
+
+            assert.equal(mustacheEngine.replacePathParameters('modules/%module/template'), 'modules/search/template');
+            assert.equal(mustacheEngine.replacePathParameters('modules/%modules/template'), 'modules/%modules/template');
         });
     });
 
@@ -179,3 +189,4 @@ describe('MustacheEngine', function() {
         });
     });
 });
+

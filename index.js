@@ -21,7 +21,7 @@ var MustacheEngine = {
      * options
      *
      * @property rootDir
-     * @default ''
+     * @default []
      * @description application basePath
      *
      * @property dataDir
@@ -41,7 +41,7 @@ var MustacheEngine = {
      * @description pattern for requests to be excluded (similar to RewriteCondition)
      */
     options: {
-        rootDir: '',
+        rootDir: [],
         dataDir: '',
         templatePathOverides : '',
         datafileExt: '.json',
@@ -105,7 +105,7 @@ var MustacheEngine = {
                 }
 
                 this.partials[match] = {
-                    data: JSON.parse(this.getPartialData(parts[1])) || null,
+                    data: this.getPartialData(parts[1]),
                     content: this.getPartialContent(parts[0], this.staticData.config)
                 };
             }
@@ -205,16 +205,17 @@ var MustacheEngine = {
     getPartialFile: function (fileName, channel) {
 
         var fileContent = '';
-        var filePath;
+        var file;
+        var siteFile = this.getSiteFilePath(fileName, channel);
 
-        filePath = this.fileExistsOnPath(this.getSiteFilePath(fileName, channel))
-            ? this.getSiteFilePath(fileName, channel)
+        file = this.fileExistsOnPath(siteFile.path, this.options.rootDir[0])
+            ? siteFile
             : this.getDefaultFilePath(fileName, channel);
 
         try {
-            fileContent = this.readFileContent(filePath, 'utf8');
+            fileContent = this.readFileContent(file.path, file.root, 'utf8');
         } catch (e) {
-            throw new Error('Partial file not found: ' + filePath);
+            throw e;
         }
 
         return fileContent;
@@ -222,12 +223,31 @@ var MustacheEngine = {
 
     /**
      * getDefaultFilePath
+     * @description will iterate through rootDir property until a match is found
      * @param fileName
      * @param channel
      * @returns {*}
      */
     getDefaultFilePath: function (fileName, channel) {
-        return this.replacePlaceHolderInPath(fileName, channel);
+
+        var filePath;
+
+        for (var path in this.options.rootDir) {
+            if (this.options.rootDir.hasOwnProperty(path)) {
+
+                filePath = this.replacePathParameters(fileName);
+
+                if (this.fileExistsOnPath(filePath, this.options.rootDir[path])) {
+
+                    filePath = this.replacePlaceHolderInPath(filePath, channel);
+
+                    return {
+                        path: filePath,
+                        root: this.options.rootDir[path]
+                    };
+                }
+            }
+        }
     },
 
     /**
@@ -237,7 +257,13 @@ var MustacheEngine = {
      * @returns {string|*}
      */
     getSiteFilePath: function (fileName, channel) {
-        return path.join(this.getSiteName(), this.replacePlaceHolderInPath(fileName, channel));
+
+        var filePath = this.replacePathParameters(this.replacePlaceHolderInPath(fileName, channel));
+
+        return {
+            path: path.join(this.getSiteName(), filePath),
+            root: this.options.rootDir[0]
+        };
     },
 
     /**
@@ -256,22 +282,40 @@ var MustacheEngine = {
     },
 
     /**
-     * readFileContent
-     * @param filePath
-     * @param encoding
+     * replacePathParameters
+     * @param filePath {String}
      * @returns {*}
      */
-    readFileContent: function (filePath, encoding) {
-        return fs.readFileSync(path.join(this.options.rootDir, filePath), encoding);
+    replacePathParameters: function(filePath) {
+        for (var p in this.placeHolders) {
+            if (this.placeHolders.hasOwnProperty(p)) {
+                if (filePath.search('/%' + p + '/') >= 0) {
+                    filePath = filePath.replace('%' + p, this.placeHolders[p]);
+                }
+            }
+        }
+
+        return filePath;
     },
 
     /**
      * readFileContent
      * @param filePath
+     * @param encoding
      * @returns {*}
      */
-    fileExistsOnPath: function (filePath) {
-        return fs.existsSync(path.join(this.options.rootDir, filePath));
+    readFileContent: function (filePath, root, encoding) {
+        return fs.readFileSync(path.join(root, filePath), encoding);
+    },
+
+    /**
+     * fileExistsOnPath
+     * @param filePath
+     * @param root
+     * @returns {*}
+     */
+    fileExistsOnPath: function (filePath, root) {
+        return fs.existsSync(path.join(root, filePath));
     },
 
     /**
@@ -352,12 +396,12 @@ var MustacheEngine = {
         var fileName;
 
         if (!identifier) {
-            return false;
+            return null;
         }
 
         fileName = this.parsePartialDataFileName(identifier);
 
-        return this.getPartialDataFile(fileName);
+        return JSON.parse(this.getPartialDataFile(fileName));
     },
 
     /**
@@ -481,6 +525,14 @@ var MustacheEngine = {
     },
 
     /**
+     * setPlaceHolders
+     * @param placeHolders
+     */
+    setPlaceHolders : function (placeHolders) {
+        this.placeHolders = placeHolders;
+    },
+
+    /**
      * middleware
      * @description Connect middleware function to  compile requested file as mustache template before serving response.
      * @param options
@@ -507,6 +559,9 @@ var MustacheEngine = {
             var pageParams = MustacheEngine.getPageParams(req);
             var channel = MustacheEngine.getChannel(pageParams.channel);
 
+            //set placeholders for partial path replacement
+            MustacheEngine.setPlaceHolders(pageParams);
+
             MustacheEngine.setStaticData(channel, pagePath);
 
             var write = res.write,
@@ -518,7 +573,11 @@ var MustacheEngine = {
                     var mustacheTemplate = chunk.toString();
 
                     if (pageParams.oldMapper && pageParams.newMapper) {
-                        mustacheTemplate = MustacheEngine.swapMappers(mustacheTemplate, pageParams.oldMapper, pageParams.newMapper);
+                        mustacheTemplate = MustacheEngine.swapMappers(
+                            mustacheTemplate,
+                            pageParams.oldMapper,
+                            pageParams.newMapper
+                        );
                     }
 
                     MustacheEngine.parseRequestHtml(mustacheTemplate);
@@ -533,11 +592,13 @@ var MustacheEngine = {
 
                     return write.call(res, completeBody);
                 } catch (e) {
+
                     if (!res.headersSent) {
                         res.writeHead(500, {'Content-Type': 'text/plain'});
                     }
 
                     process.stdout.write(e);
+
                     return write.call(res, e.message);
                 }
             };
