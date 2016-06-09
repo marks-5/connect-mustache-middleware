@@ -69,7 +69,7 @@ describe('MustacheEngine', function() {
     describe('Method: parseRequestHtml', function() {
         it('should match data and return JSON data filename', function() {
 
-            body = fs.readFileSync(mustacheEngine.options.rootDir[0] + '/index.html', 'utf8');
+            body = fs.readFileSync(mustacheEngine.getRootDir()[0] + '/index.html', 'utf8');
 
             mustacheEngine.parseRequestHtml(body);
 
@@ -92,13 +92,23 @@ describe('MustacheEngine', function() {
         });
     });
 
+    describe('Method: getRootDir', function() {
+        it('should return array', function() {
+            mustacheEngine.options.rootDir = '123';
+            assert.deepEqual(mustacheEngine.getRootDir(), ['123']);
+
+            mustacheEngine.options.rootDir = ['123'];
+            assert.deepEqual(mustacheEngine.getRootDir(), ['123']);
+        });
+    });
+
     describe('Method: fileExistsOnPath', function() {
         it('should return true if file exists', function() {
-            assert.equal(mustacheEngine.fileExistsOnPath('views/header.html', mustacheEngine.options.rootDir[0]), true);
+            assert.equal(mustacheEngine.fileExistsOnPath('views/header.html', mustacheEngine.getRootDir()[0]), true);
         });
 
         it('should return false if file doesn\'t exist', function() {
-            assert.equal(mustacheEngine.fileExistsOnPath('views/xyz.html', mustacheEngine.options.rootDir[0]), false);
+            assert.equal(mustacheEngine.fileExistsOnPath('views/xyz.html', mustacheEngine.getRootDir()[0]), false);
         });
     });
 

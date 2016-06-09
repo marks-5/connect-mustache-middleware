@@ -208,7 +208,7 @@ var MustacheEngine = {
         var file;
         var siteFile = this.getSiteFilePath(fileName, channel);
 
-        file = this.fileExistsOnPath(siteFile.path, this.options.rootDir[0])
+        file = this.fileExistsOnPath(siteFile.path, this.getRootDir()[0])
             ? siteFile
             : this.getDefaultFilePath(fileName, channel);
 
@@ -222,6 +222,14 @@ var MustacheEngine = {
     },
 
     /**
+     * getRootDir
+     * @returns {Array}
+     */
+    getRootDir: function () {
+        return Array.isArray(this.options.rootDir) ? this.options.rootDir : [this.options.rootDir];
+    },
+
+    /**
      * getDefaultFilePath
      * @description will iterate through rootDir property until a match is found
      * @param fileName
@@ -232,18 +240,20 @@ var MustacheEngine = {
 
         var filePath;
 
-        for (var path in this.options.rootDir) {
-            if (this.options.rootDir.hasOwnProperty(path)) {
+        var roots = this.getRootDir();
+
+        for (var path in roots) {
+            if (roots.hasOwnProperty(path)) {
 
                 filePath = this.replacePathParameters(fileName);
 
-                if (this.fileExistsOnPath(filePath, this.options.rootDir[path])) {
+                if (this.fileExistsOnPath(filePath, roots[path])) {
 
                     filePath = this.replacePlaceHolderInPath(filePath, channel);
 
                     return {
                         path: filePath,
-                        root: this.options.rootDir[path]
+                        root: roots[path]
                     };
                 }
             }
@@ -262,7 +272,7 @@ var MustacheEngine = {
 
         return {
             path: path.join(this.getSiteName(), filePath),
-            root: this.options.rootDir[0]
+            root: this.getRootDir()[0]
         };
     },
 
