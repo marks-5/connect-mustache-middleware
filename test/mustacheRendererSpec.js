@@ -10,7 +10,7 @@ describe('MustacheEngine', function() {
 
     function setOptions () {
         mustacheEngine.setOptions({
-            rootDir: ['./test/demo/rootDir'],
+            rootDir: './test/demo/rootDir',
             dataDir: './test/demo/dataDir',
             datafileExt: '.json',
             templateExt: '.html',

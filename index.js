@@ -35,10 +35,6 @@ var MustacheEngine = {
      * @property templateExt
      * @default '.html'
      * @description file extension for template files
-     *
-     * @property exclude
-     * @default ''
-     * @description pattern for requests to be excluded (similar to RewriteCondition)
      */
     options: {
         rootDir: [],
@@ -46,7 +42,6 @@ var MustacheEngine = {
         templatePathOverides : '',
         datafileExt: '.json',
         templateExt: '.html',
-        exclude: '',
         staticDataTypes: {}
     },
 
@@ -558,10 +553,7 @@ var MustacheEngine = {
 
         return function (req, res, next) {
 
-            // Skip mustache rendering if the resource is in exclusions list
-            var exclude = MustacheEngine.options.exclude;
-
-            if (req.url.match(/\./) || (exclude && req.url.match(exclude))) {
+            if (req.url.match(/\./) && !req.url.match(/\.html/)) {
                 return next();
             }
 
