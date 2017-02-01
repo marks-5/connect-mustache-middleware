@@ -240,11 +240,9 @@ var MustacheEngine = {
         for (var path in roots) {
             if (roots.hasOwnProperty(path)) {
 
-                filePath = this.replacePathParameters(fileName);
+                filePath = this.replacePlaceHolderInPath(fileName, channel);
 
                 if (this.fileExistsOnPath(filePath, roots[path])) {
-
-                    filePath = this.replacePlaceHolderInPath(filePath, channel);
 
                     return {
                         path: filePath,
@@ -263,7 +261,7 @@ var MustacheEngine = {
      */
     getSiteFilePath: function (fileName, channel) {
 
-        var filePath = this.replacePathParameters(this.replacePlaceHolderInPath(fileName, channel));
+        var filePath = this.replacePlaceHolderInPath(fileName, channel);
 
         return {
             path: path.join(this.getSiteName(), filePath),
@@ -284,23 +282,6 @@ var MustacheEngine = {
         }
 
         return fileName;
-    },
-
-    /**
-     * replacePathParameters
-     * @param filePath {String}
-     * @returns {*}
-     */
-    replacePathParameters: function(filePath) {
-        for (var p in this.placeHolders) {
-            if (this.placeHolders.hasOwnProperty(p)) {
-                if (filePath.search('/%' + p + '/') >= 0) {
-                    filePath = filePath.replace('%' + p, this.placeHolders[p]);
-                }
-            }
-        }
-
-        return filePath;
     },
 
     /**
