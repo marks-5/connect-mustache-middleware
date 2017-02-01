@@ -112,15 +112,6 @@ describe('MustacheEngine', function() {
         });
     });
 
-    describe('Method: replacePathParameters', function() {
-        it('should replace placeholder from placeholders property if exact match in filePath', function() {
-            mustacheEngine.setPlaceHolders({module : 'search'});
-
-            assert.equal(mustacheEngine.replacePathParameters('modules/%module/template'), 'modules/search/template');
-            assert.equal(mustacheEngine.replacePathParameters('modules/%modules/template'), 'modules/%modules/template');
-        });
-    });
-
     describe('Method: getPartialFile', function() {
         it('should look at the default rootDir when called without args', function() {
             assert.equal(mustacheEngine.getPartialFile('views/header.html', {}), '<h2>{{headerData}}</h2>');
