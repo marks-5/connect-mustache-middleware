@@ -36,16 +36,16 @@
   "devDependencies": {
     "mocha": "2.2.5",
     "eslint": "1.2.1",
-    "eslint-config-fear-core": "git+https://github.com/digitalinnovation/fear-core-eslint-config",
-    "fear-core-build" : "1.1.0",
-    "fear-core-ui": "git+https://github.com/DigitalInnovation/fear-core-ui#develop",
+    "eslint-config-mns-core": "1.0.6",
+    "fear-core-build": "1.1.0",
+    "fear-core-ui": "4.0.11",
     "gh-pages": "0.10.0",
     "jsdoc": "3.4.0",
     "sinon": "1.14.1"
   },
   "dependencies": {
-    "mustache": "0.8.2",
     "extend": "2.0.1",
+    "mustache": "^2.2.1",
     "yargs": "4.2.0"
   }
 }
